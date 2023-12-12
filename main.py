@@ -1,26 +1,66 @@
-def get_message():
-    val = input("Enter your message: ")
-    return val
+import sys
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QAction, QLineEdit, QMessageBox
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import pyqtSlot
 
-def get_shift():
-    shift = int(input("Enter the number of shifts: "))
-    return shift
+class App(QMainWindow):
 
-def encode_message(message, shifts):
-    encoded_message = ''
-    for letter in message:
-        if letter.isalpha():
-            encoded_message += chr(ord(letter) + shifts)
-        else:
-            encoded_message += letter
+    def __init__(self):
+        super().__init__()
+        self.title = 'Caesar Cipher Cracker'
+        self.left = 10
+        self.top = 10
+        self.width = 400
+        self.height = 140
+        self.initUI()
+    
+    def initUI(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+    
+        # Create textbox
+        self.textbox = QLineEdit(self)
+        self.textbox.move(20, 20)
+        self.textbox.resize(280,40)
 
-    return encoded_message
+        # Create textbox
+        self.numbox = QLineEdit(self)
+        self.numbox.move(300, 20)
+        self.numbox.resize(280,40)
+        
+        # Create a button in the window
+        self.button = QPushButton('Show encoded message', self)
+        self.button.move(20,80)
+        
+        # connect button to function on_click
+        self.button.clicked.connect(self.on_click)
+        self.show()
+    
+    @pyqtSlot()
+    def on_click(self):
+        textboxValue = self.textbox.text()
+        shiftsValue = self.numbox.text()
 
-def main():
-    message = get_message()
-    shifts = get_shift()
-    encrypted = encode_message(message, shifts)
-    print(encrypted)
-   
-if __name__ == "__main__":
-    main()
+        encoded_message = Cipherer.encode_message(self, textboxValue, shiftsValue)
+
+        QMessageBox.question(self, 'Message encoded!', "Encoded message: " + encoded_message, QMessageBox.Ok, QMessageBox.Ok)
+        self.textbox.setText("")
+
+class Cipherer():
+    
+    def encode_message(self, message, shifts):
+        encoded_message = ''
+        for letter in message:
+            if letter.isalpha():
+                encoded_message += chr(ord(letter) + int(shifts))
+            else:
+                encoded_message += letter
+
+        return encoded_message
+        
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = App()
+    sys.exit(app.exec_())
